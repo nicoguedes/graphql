@@ -31,10 +31,18 @@ namespace CommanderGQL
             services.AddPooledDbContextFactory<AppDbContext>(opt => opt.UseSqlServer
             (Configuration.GetConnectionString("DefaultConnection")));
 
+            services.AddCors(option =>
+            {
+                option.AddPolicy("AllowAll",
+                    builder => builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()
+                    );
+            });
+
             services
                 .AddGraphQLServer()
                 .AddQueryType<Query>()
                 .AddProjections();
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -47,6 +55,8 @@ namespace CommanderGQL
 
             app.UseRouting();
 
+            app.UseCors("AllowAll");
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapGraphQL();
@@ -57,6 +67,7 @@ namespace CommanderGQL
             {
                 GraphQLEndPoint = "/graphql"
             }, "/graphql-voyager");
+
         }
     }
 }
